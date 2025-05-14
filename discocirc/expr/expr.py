@@ -119,7 +119,7 @@ class Expr:
     @staticmethod
     def lst(expr_list, interchange='auto', head=None):
         """
-        Returns a new Expr object representing a list of given Expr objects. 
+        Returns a new Expr object representing a list of given Expr objects.
         """
         if interchange == 'auto':
             interchange = if_interchange_list_type(expr_list)
@@ -316,15 +316,9 @@ def map_typ_indices(typ, mapping):
             else:
                 new_index.add(idx)
         typ.index = new_index
-    if isinstance(typ, Func):
-        input_typ = map_typ_indices(typ.input, mapping)
-        output_typ = map_typ_indices(typ.output, mapping)
-        typ = Func(input_typ, output_typ, typ.index)
-    if len(typ.objects) > 1:
-        new_objects = []
-        for obj in typ.objects:
-            new_objects.append(map_typ_indices(obj, mapping))
-        typ = Ty(*new_objects, index=typ.index)
+    if len(typ.inside) > 1:
+        for obj in typ.inside:
+            obj.typ = map_typ_indices(obj, mapping)
     return typ
 
 def map_expr_indices(expr, mapping, reduce=True):

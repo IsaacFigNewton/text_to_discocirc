@@ -1,5 +1,5 @@
 import random
-from lambeq import CCGAtomicType, CCGRule
+from lambeq import AtomicType, CCGRule
 
 from discocirc.expr import Expr
 from discocirc.expr.expr import create_index_mapping_dict, map_expr_indices
@@ -53,11 +53,11 @@ def ccg_to_expr(ccg_parse):
         result = composition(ccg_parse, children[1], children[0])
     elif ccg_parse.rule == CCGRule.CONJUNCTION:
         first_word = ccg_parse.children[0].biclosed_type
-        if CCGAtomicType.conjoinable(first_word):
+        if AtomicType.conjoinable(first_word):
             w0, w1 = 0, 1
         else:
             w0, w1 = 1, 0
-        # w0, w1 = 0, 1 if CCGAtomicType.conjoinable(first_word) else 1, 0
+        # w0, w1 = 0, 1 if AtomicType.conjoinable(first_word) else 1, 0
         conjunction = children[w0]
         conjunct = children[w1]
         word_index = ccg_parse.children[w0].original.variable.fillers[0].index

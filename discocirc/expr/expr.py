@@ -8,7 +8,7 @@ class Expr:
     """
     A class representing an expression in the simply-typed lambda calculus.
     """
-    def __init__(self, name, expr_type, typ, head) -> None:
+    def __init__(self, name:str, expr_type:str, typ, head) -> None:
         """
         Initializes an Expr object with the given name, expression type, type, and head.
         """
@@ -171,7 +171,7 @@ class Expr:
         If `match_indices` is True, then the overlapping indices of `arg` and the input type of `fun` are matched.
         """
         if not isinstance(fun.typ, Func):
-            raise TypeError(f"Cannot apply\n{fun}\nto\n{arg}: function is of type {type(fun.typ)}")
+            raise TypeError(f"Cannot apply\n{fun}\nto\n{arg}: function is of type {type(fun.typ)}, with expr_type == {fun.expr_type}")
         if not types_match_modulo_curry(fun.typ.input, arg.typ):
             new_expr = Expr.partial_apply(fun, arg, context)
         elif fun.expr_type == "lambda" and reduce:

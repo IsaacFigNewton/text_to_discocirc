@@ -8,12 +8,13 @@ from lambeq import BobcatParser
 
 from discocirc.helpers.discocirc_utils import get_last_initial_noun
 from discocirc.diag.drag_up import drag_all
-from discocirc.pipeline.sentence_to_circuit import sentence2circ
+from discocirc.pipeline.sentence_to_circuit import sentences2circs
 
 parser = BobcatParser(verbose='suppress')
 # Load a SpaCy English model
 spacy_model = spacy.load('en_core_web_trf')
 spacy_model.add_pipe('fastcoref')
+
 
 # NOTE: this function may become redundant
 def noun_sort(circ):
@@ -42,7 +43,13 @@ def noun_sort(circ):
     return circ
 
 
-def sentence_list_to_circuit(context, simplify_swaps=True, wire_order='intro_order', spacy_model=spacy_model, add_indices_to_types=True, frame_expansion=True, doc=None):
+def sentence_list_to_circuit(context,
+                             simplify_swaps=True,
+                             wire_order='intro_order',
+                             spacy_model=spacy_model,
+                             add_indices_to_types=True,
+                             frame_expansion=True,
+                             doc=None):
     """
     Parameters:
     -----------
@@ -60,13 +67,12 @@ def sentence_list_to_circuit(context, simplify_swaps=True, wire_order='intro_ord
     context_circ : discopy.rigid.Diagram
     """
     sentence_circuits = []
-    for sentence in context:
-        sentence_diag = sentence2circ(parser,
-                                      sentence,
-                                      spacy_model = spacy_model,
-                                      add_indices_to_types = add_indices_to_types,
-                                      frame_expansion = frame_expansion)
-        sentence_circuits.append(sentence_diag)
+    sentence_circuits = sentences2circs(parser,
+                                        context,
+                                        spacy_model=spacy_model,
+                                        add_indices_to_types=add_indices_to_types,
+                                        frame_expansion=frame_expansion)
+
     corefs, corefs_sent_ids = get_corefs(doc)
     context_circ = compose_circuits_using_corefs(sentence_circuits, corefs, corefs_sent_ids)
 
@@ -81,6 +87,7 @@ def sentence_list_to_circuit(context, simplify_swaps=True, wire_order='intro_ord
 
     return context_circ
 
+
 def text_to_circuit(text, **kwargs):
     """
     input a given text as a string
@@ -93,7 +100,8 @@ def text_to_circuit(text, **kwargs):
         s = sent.text
         sentences.append(s)
     return sentence_list_to_circuit(sentences, spacy_model=spacy_model, doc=doc, **kwargs)
-    
+
+
 def noun_normal_form(circuit):
     """
     Takes in a circuit, and returns it in a normal form, where all the
@@ -103,17 +111,19 @@ def noun_normal_form(circuit):
     # NOTE: drag_all is a little bit broken
     return noun_sort(drag_all(circuit))
 
+
 def collect_normal_nouns(circuit):
     """
-    Takes in a circuit in noun normal form, 
+    Takes in a circuit in noun normal form,
     and returns a list of the pulled up nouns
     """
     return circuit.boxes[:get_last_initial_noun(circuit) + 1]
 
+
 def compose_circuits(circ1, circ2, wire_order='intro_order'):
     """
-    Return the sequential composite roughly corresponding 
-    to circ2 << circ 1, where common noun 
+    Return the sequential composite roughly corresponding
+    to circ2 << circ 1, where common noun
     wires are composed
 
     Parameters:
@@ -127,7 +137,7 @@ def compose_circuits(circ1, circ2, wire_order='intro_order'):
         'update_order' : the most recently updated wires occur on the right
         'intro_order' : the most recently introduced wires occur on the right
     """
-    
+
     # pull nouns to top and order them with offsets 0, 1, 2, ...
     circ1 = noun_normal_form(circ1)
     circ2 = noun_normal_form(circ2)
@@ -142,7 +152,7 @@ def compose_circuits(circ1, circ2, wire_order='intro_order'):
     for i in range(len(nouns_circ2)):
         if nouns_circ2_name[i] in nouns_circ1_name:
             ob_map[nouns_circ2[i].cod] = nouns_circ1[nouns_circ1_name.index(nouns_circ2_name[i])].cod
-    
+
     # the two functions below are used to define a functor
     def ob_map2(obj):
         if obj in ob_map.keys():
@@ -151,10 +161,10 @@ def compose_circuits(circ1, circ2, wire_order='intro_order'):
 
     def ar_map(box):
         return Box(box.name, functor(box.dom), functor(box.cod))
-    
+
     def frame_map(box):
         return Frame(box.name, functor(box.dom), functor(box.cod), [functor(inside) for inside in box.insides])
-    
+
     functor = Functor(ob_map2, ar_map, frame_map)
     circ2 = functor(circ2)
     nouns_circ2 = collect_normal_nouns(circ2)
@@ -200,9 +210,9 @@ def compose_circuits(circ1, circ2, wire_order='intro_order'):
         # adopt the noun ordering of circ2
         final_circ = circ2[:len(nouns_circ2)]
 
-        final_circ = final_circ.permute(*inv_perm)\
-            >> circ1[len(nouns_circ1):].permute(*perm)\
-            >> circ2[len(nouns_circ2):]
+        final_circ = final_circ.permute(*inv_perm) \
+                     >> circ1[len(nouns_circ1):].permute(*perm) \
+                     >> circ2[len(nouns_circ2):]
     else:
         raise Exception("Invalid wire_order.")
 
@@ -223,14 +233,14 @@ def get_corefs(doc):
     for chain in doc._.coref_chains:
         corefs.append([doc[mention[0]].text for mention in chain])
         corefs_sent_ids.append([
-            get_sentence_id(doc[mention[0]], doc_sents) 
+            get_sentence_id(doc[mention[0]], doc_sents)
             for mention in chain
         ])
     return corefs, corefs_sent_ids
 
 
 def compose_circuits_using_corefs(circs, corefs, corefs_sent_ids):
-    merged_circuit = circs[0] 
+    merged_circuit = circs[0]
     # iterate through the sentence circuits
     for i in range(1, len(circs)):
         corefs_to_merge = []
@@ -260,7 +270,7 @@ def merge_circuits(circ1, circ2, corefs_to_merge):
         # check we actually find noun boxes corresponding to the corefs
         if noun1_box is None or noun2_box is None:
             continue
-        #replace noun2 with noun1 in nouns_circ2
+        # replace noun2 with noun1 in nouns_circ2
         nouns_circ2[nouns_circ2.index(noun2_box)] = Box(noun1, noun2_box.dom, noun2_box.cod)
     nouns_diagram = Id()
     for noun in nouns_circ2:
@@ -268,10 +278,10 @@ def merge_circuits(circ1, circ2, corefs_to_merge):
     coref_resolved_circ2 = nouns_diagram >> circ2[len(nouns_circ2):]
     return compose_circuits(circ1, coref_resolved_circ2)
 
+
 def find_box_using_name(boxes, name):
     for box in boxes:
         if box.name == name:
             return box
     print('Box not found:', name)
     return None
-

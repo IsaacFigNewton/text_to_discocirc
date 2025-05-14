@@ -13,7 +13,7 @@ from discocirc.pipeline.sentence_to_circuit import sentence2circ
 parser = BobcatParser(verbose='suppress')
 # Load a SpaCy English model
 spacy_model = spacy.load('en_core_web_trf')
-spacy_model.add_pipe('coreferee')
+spacy_model.add_pipe('fastcoref')
 
 # NOTE: this function may become redundant
 def noun_sort(circ):

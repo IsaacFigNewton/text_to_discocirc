@@ -1,6 +1,6 @@
 import spacy
-from discopy.monoidal import Id, Box, Swap, Ty
-
+from discopy.monoidal import Id, Box, Ty
+from discopy.markov import Swap
 from discocirc.diag.frame import Functor
 
 spacy_model = spacy.load('en_core_web_trf')

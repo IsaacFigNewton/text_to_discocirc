@@ -10,5 +10,5 @@ __all__ = [
 
 from discocirc import (diag, expr, helpers, pipeline)
 
-from discocirc.version import (version as __version__,
+from discocirc import (version as __version__,
                                version_tuple as __version_info__)

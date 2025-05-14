@@ -1,8 +1,7 @@
 from argparse import ArgumentError
 from discopy import rigid
-from discopy.rigid import Ty, Box
+from discopy.rigid import Ty, Box, Ob
 from discopy.monoidal import Functor
-from discopy import Ob
 
 from discocirc.expr.expr import Expr, expr_type_recursion
 from discocirc.helpers.closed import Func, Ty, index_to_string

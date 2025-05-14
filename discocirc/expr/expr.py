@@ -83,7 +83,7 @@ class Expr:
         Returns a new Expr object representing a literal with the given name, type, and head.
         """
         return Expr(name=name,
-                       expr_name="literal",
+                       expr_type="literal",
                        typ=typ,
                        head=head)
 
@@ -93,7 +93,7 @@ class Expr:
         Returns a new Expr object λvar.body representing a lambda expression with the given variable, body, and head.
         """
         lambda_expr = Expr(name=body.name,
-                           expr_name="lambda",
+                           expr_type="lambda",
                            typ=Func(var.typ, body.typ, index),
                            head=head)
         lambda_expr.var = var
@@ -109,7 +109,7 @@ class Expr:
             raise TypeError(f"Type of \n{arg}\n does not"
                             + f"match the input type of \n{fun}")
         app_expr = Expr(name=f"{fun.name}({arg.name})",
-                        expr_name="application",
+                        expr_type="application",
                         typ=fun.typ.output,
                         head=head)
         app_expr.fun = fun
@@ -125,7 +125,7 @@ class Expr:
             interchange = if_interchange_list_type(expr_list)
         flattened_list = get_flattened_expr_list(expr_list)
         expr = Expr(name=get_expr_list_name(flattened_list),
-                    expr_name="list",
+                    expr_type="list",
                     typ=infer_list_type(flattened_list, interchange),
                     head=head)
         expr.expr_list = tuple(flattened_list)

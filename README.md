@@ -2,11 +2,11 @@
 
 Automatic generation of DisCoCirc circuits using CCG.
 
-To install, run `pip install -e .`,
-which installs the package in "editable mode".
-(No need to reinstall after each edit.)
+## Setup Steps
 
-You will also need a spacy model:
+1. Run `!git clone https://github.com/CQCL/text_to_discocirc` to clone the repo
+2. Then run `pip install -e ./text_to_discocirc` to install the package in "editable mode" (No need to reinstall after each edit.).
+3. You will also need a spacy model, so run the following:
 ```bash
 python -m spacy download en_core_web_trf
 python -m spacy download en_core_web_lg

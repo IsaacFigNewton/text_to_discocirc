@@ -42,9 +42,9 @@ def ccg_to_expr(ccg_parse):
 
     # Rules with 2 children
     elif ccg_parse.rule == CCGRule.FORWARD_APPLICATION:
-        result = children[0].apply(children[1])
+        result = children[0](children[1])
     elif ccg_parse.rule == CCGRule.BACKWARD_APPLICATION:
-        result = children[1].apply(children[0])
+        result = children[1](children[0])
     elif ccg_parse.rule == CCGRule.FORWARD_COMPOSITION \
             or ccg_parse.rule == CCGRule.FORWARD_CROSSED_COMPOSITION:
         result = composition(ccg_parse, children[0], children[1])

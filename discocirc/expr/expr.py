@@ -171,7 +171,7 @@ class Expr:
         If `match_indices` is True, then the overlapping indices of `arg` and the input type of `fun` are matched.
         """
         if not isinstance(fun.typ, Func):
-            raise TypeError(f"Cannot apply\n{fun}\nto\n{arg}: function is of type {fun.typ}")
+            raise TypeError(f"Cannot apply\n{fun}\nto\n{arg}: function is of type {type(fun.typ)}")
         if not types_match_modulo_curry(fun.typ.input, arg.typ):
             new_expr = Expr.partial_apply(fun, arg, context)
         elif fun.expr_type == "lambda" and reduce:

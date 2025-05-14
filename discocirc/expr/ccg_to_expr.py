@@ -28,7 +28,7 @@ def ccg_to_expr(ccg_parse):
     # Rules with 1 child
     elif ccg_parse.rule == CCGRule.FORWARD_TYPE_RAISING \
             or ccg_parse.rule == CCGRule.BACKWARD_TYPE_RAISING:
-        word_index = ccg_parse.children[0].original.variable.fillers[0].index
+        word_index = ccg_parse.children[0].metadata["original"].variable.fillers[0].index
         tr_type = ccg_cat_to_closed(ccg_parse.metadata["original"].cat, str(word_index))
         x = create_random_variable(tr_type.input)
         result = Expr.lmbda(x, x(children[0]), tr_type.index)
@@ -60,7 +60,7 @@ def ccg_to_expr(ccg_parse):
         # w0, w1 = 0, 1 if AtomicType.conjoinable(first_word) else 1, 0
         conjunction = children[w0]
         conjunct = children[w1]
-        word_index = ccg_parse.children[w0].original.variable.fillers[0].index
+        word_index = ccg_parse.children[w0].metadata["original"].variable.fillers[0].index
         if conjunct.typ == Ty('n'):
             second_conjunct_typ = Ty('n', index=set([str(word_index) + '_x']))
             final_idx = set.union(conjunct.typ.index, second_conjunct_typ.index)

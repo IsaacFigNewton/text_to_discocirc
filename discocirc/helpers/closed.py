@@ -186,7 +186,7 @@ def ccg_cat_to_closed(cat, word_str=None):
     if word_str:
         assert(type(word_str)==str)
     if cat.atomic:
-        typ = biclosed_to_closed(BobcatParser._to_biclosed(cat).discopy())
+        typ = biclosed_to_closed(BobcatParser._to_biclosed(cat))
     else:
         result_typ = ccg_cat_to_closed(cat.result, word_str)
         argument_typ = ccg_cat_to_closed(cat.argument, word_str)
